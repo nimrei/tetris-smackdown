@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+    <head>
+        <title>jQuery Tetris plug-in</title>
+
+        <style>
+            #tetris {
+                position: relative;
+                border: 1px solid #ccc;
+                border-radius: .4em;
+                box-shadow: 0 0 1em #ccc;
+                margin: 10px auto 0;
+            }
+
+            .tile {
+                border-radius: .2em;
+                position: absolute;
+                width: 15px;
+                height: 15px;
+                border: 1px solid #333;
+                background: red;
+            }
+
+            .type-I { background-color: cyan; }
+            .type-O { background-color: yellow; }
+            .type-T { background-color: purple; }
+            .type-S { background-color: green; }
+            .type-Z { background-color: red; }
+            .type-J { background-color: blue; }
+            .type-L { background-color: orange; }
+
+            ul.details { 
+                position:absolute;
+                bottom:-24px;
+                list-style: none;
+                padding:0;
+                margin: 0 auto;  
+                width:100%;
+            }
+
+            ul.details li {width:50%;float:left;}
+            ul.details li:last-child {text-align:right;}
+
+
+            html, body {
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font: 75%/1.5 Verdana,sans-serif;
+            }
+
+            h1 {
+                text-align: center;
+            }
+
+            section {
+                width: 30em;
+                margin: 0 auto;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Tetris (1 player mode)</h1>
+        <section>
+           <div id="tetris">
+           <ul class="details">
+            <li>Lines: <span class="lines">0</span></li>        
+            <li>Level: <span class="level">0</span></li>
+           </ul>
+           </div>
+            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+            <script type="text/javascript" src="jquery.tetris.js"></script>
+            <script type="text/javascript">
+            	$('#tetris').tetris({
+					refresh: 4000
+				}).data('tetris').start();
+            </script>
+        </section>
+    </body>
+</html>
