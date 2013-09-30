@@ -24,7 +24,8 @@ if ( typeof Object.create !== 'function' ) {
             DOWN: 40,
 			LEFT: 37,
             RIGHT: 39,
-            SPACEBAR: 32
+            SPACEBAR: 32,
+            R: 82
         };
 
     var gameState = {
@@ -55,6 +56,20 @@ if ( typeof Object.create !== 'function' ) {
                 width: self.options.columns * self.options.tileSize,
                 height: self.options.rows * self.options.tileSize
             });
+
+			//setup gameover screen
+			for(var i=0; i<self.options.rows;i++){
+				for(var j=0; j<self.options.columns;j++){
+					self.$elem.find('.gameover').append(
+						$('<div>', {
+								class: 'gameover-tile type-' + blockType[Math.floor(Math.random()*7)],//self.randomTile()],
+							}).css({top: i*self.options.tileSize, left: j*self.options.tileSize})
+						);
+				}
+			}	
+
+			//bind our keypress methods - should only do this once
+			$(document).bind('keydown',  $.proxy(self.keyDown, self));
 		},
 
 		//captures a key event and redirects to appropriate event
@@ -89,7 +104,15 @@ if ( typeof Object.create !== 'function' ) {
             	break;
 
             	case keys.SPACEBAR: //toggle pause/running
-            		self.togglePause();
+					if(self.gameState == gameState.RUNNING || self.gameState == gameState.PAUSED){
+            			self.togglePause();
+            		}
+            	break;
+
+            	case keys.R: //restart game in case of game over
+            		if(self.gameState == gameState.GAMEOVER){
+            			self.start();
+            		}
             	break;
             }
 
@@ -489,9 +512,14 @@ if ( typeof Object.create !== 'function' ) {
 			}
 			else {
 				self.freeze();
-				
 
 				self.currentTile = self.makeTile();
+
+				//check here for gameover state - i.e. can a new tile fit where its first placed?
+				if(!self.canMoveHere(self.currentTile)){
+					self.gameover();
+				}
+
 			}
 
 			self.render();
@@ -512,8 +540,12 @@ if ( typeof Object.create !== 'function' ) {
 		start: function () {
 			var self = this;
 
-			//bind our keypress methods
-			$(document).bind('keydown',  $.proxy(self.keyDown, self));
+			//hide the gameover screen
+			self.$elem.find('.gameover').hide();
+
+			//get rid of any existing tile elements
+			self.$elem.find('.frozen, .current').remove();
+
 
 			//set our scrolling rate
 			self.options.refresh = 6000;
@@ -532,6 +564,17 @@ if ( typeof Object.create !== 'function' ) {
 
 
 			self.render();
+		},
+
+		gameover: function() {
+			var self = this;
+
+			self.gameState = gameState.GAMEOVER;
+
+			self.$elem.find('.gameover').slideDown();
+			
+			window.clearInterval(self.timer);
+
 		},
 
 		togglePause: function() {
