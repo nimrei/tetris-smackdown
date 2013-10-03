@@ -3,7 +3,7 @@ tetris-smackdown
 
 tetris clone in jquery
 
-More columns than ancient Greece! More lines than a Studio 54!
+More columns than ancient Greece! More lines than Studio 54!
 
 
 ###The Challenge:
