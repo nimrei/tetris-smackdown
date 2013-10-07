@@ -241,6 +241,9 @@ if ( typeof Object.create !== 'function' ) {
 					.addClass('down-'+rowsToMoveDown);
 			}
 
+
+			self.pause();
+
 			//update elements -> flash a couple of times before removing
 			$.when(self.$elem.find('.to-remove')
 				.fadeOut(100)
@@ -262,6 +265,8 @@ if ( typeof Object.create !== 'function' ) {
 						.css('top','+='+rowPixelModifier)
 						.removeClass('down-'+i);
 				}
+
+				self.resume();
 			});
 
 		},
