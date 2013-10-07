@@ -241,19 +241,28 @@ if ( typeof Object.create !== 'function' ) {
 					.addClass('down-'+rowsToMoveDown);
 			}
 
-			//update elements
-			self.$elem
-				.find('.to-remove')
-				.remove();
-
-			for(var i=1;i<=linesToRemove.length;i++){
-				//TODO: replace with nice animations
-				var rowPixelModifier = i*self.options.tileSize;
+			//update elements -> flash a couple of times before removing
+			$.when(self.$elem.find('.to-remove')
+				.fadeOut(100)
+				.fadeIn(100)
+				.fadeIn(100)
+				.fadeOut(100)
+				)
+			.done(function(){
+				
 				self.$elem
-					.find('.down-'+i)
-					.css('top','+='+rowPixelModifier)
-					.removeClass('down-'+i);
-			}
+					.find('.to-remove')
+					.remove();
+
+				for(var i=1;i<=linesToRemove.length;i++){
+				
+					var rowPixelModifier = i*self.options.tileSize;
+					self.$elem
+						.find('.down-'+i)
+						.css('top','+='+rowPixelModifier)
+						.removeClass('down-'+i);
+				}
+			});
 
 		},
 
@@ -333,7 +342,6 @@ if ( typeof Object.create !== 'function' ) {
 
 			}
 
-			//TODO: replace with nice animations
 			//finally, lets move all our existing rows up by the relevant amount			
 			var rowPixelModifier = linesToAdd*self.options.tileSize;
 			self.$elem
