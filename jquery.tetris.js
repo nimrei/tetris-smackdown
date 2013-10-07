@@ -114,6 +114,12 @@ if ( typeof Object.create !== 'function' ) {
             			self.start();
             		}
             	break;
+
+				case 85:
+            		if(self.gameState == gameState.RUNNING){
+	            		self.addLines(1);
+	            	}
+				break;
             }
 
 		},
@@ -249,9 +255,94 @@ if ( typeof Object.create !== 'function' ) {
 					.removeClass('down-'+i);
 			}
 
+		},
 
+
+		//TODO: make sure lineAdd does an appropriate check for gameover once the lines are added in 
+		//		i.e. does the new frozen board overlap the current tile?
+
+		// adds lines to the bottom of the current player's board
+		// this function will be triggered when an opponent scores > 2 lines
+		addLines: function(linesToAdd){
+			var self = this;
+
+
+			//move every line up num_lines on the frozen board
+		
+			//for the line we're adding
+			for(var i=0;i<self.options.rows;i++){
+
+				//move their 'frozen entries'
+				for(var j=0;j<self.options.columns;j++){		
+
+					//if its a frozen block	
+					if(self.frozen[(i*self.options.columns)+j]){
+
+						var oldIndex = (i*self.options.columns)+j;
+						var newIndex = ((i-linesToAdd)*self.options.columns)+j
+						
+						//delete its old frozen entry
+						delete self.frozen[(i*self.options.columns)+j];
+
+						//add new entry in new frozen index
+						self.frozen[newIndex] = true;
+					
+
+						//mark their relevant pieces as 'up-{linesToAdd}'
+						var currentLineTopPosition = Math.floor(i%self.options.rows)*self.options.tileSize;
+				
+						self.$elem
+						.find(".frozen")
+						.filter(function() {return $(this).css('top') == currentLineTopPosition+'px';})
+						.addClass('up-'+linesToAdd);
+					}
+				}
+			}
+
+
+
+			var randomColumn = Math.floor(Math.random() * self.options.columns);
+
+			//now lets add in our new rows
+
+			//PRE: at this stage the frozen board should be empty for items in the last 'linesToAdd' rows
+			for(var i=self.options.rows-linesToAdd;i<self.options.rows;i++){
+
+				for(var j=0;j<self.options.columns;j++){
+				
+					if(j != randomColumn){
+						
+						//set our frozen index
+						var index = (i*self.options.columns)+j;
+						self.frozen[index] = true;
+
+						//add new element at relevant spot
+						var currentTopPosition = Math.floor(i%self.options.rows)*self.options.tileSize;
+						var currentLeftPosition = Math.floor(j%self.options.columns)*self.options.tileSize;								
+						self.$elem.append(
+							$('<div>')
+								.addClass('tile frozen type-Opponent')
+								.css({
+										left: currentLeftPosition,
+										top: currentTopPosition
+									})
+							);
+					}
+
+				}
+
+			}
+
+			//TODO: replace with nice animations
+			//finally, lets move all our existing rows up by the relevant amount			
+			var rowPixelModifier = linesToAdd*self.options.tileSize;
+			self.$elem
+				.find('.up-'+linesToAdd)
+				.css('top','-='+rowPixelModifier)
+				.removeClass('.up-'+linesToAdd);
 
 		},
+
 
 		//renders the currentTile on our container element
 		render: function() {
@@ -532,7 +623,7 @@ if ( typeof Object.create !== 'function' ) {
 
 			window.clearInterval(self.timer);
 			self.level = newLevel;
-			self.options.refresh = (6000-(self.level*300)) < 0 ? 0 : (6000-(self.level*300));
+			self.options.refresh = (1500-(self.level*75)) < 0 ? 0 : (1500-(self.level*75));
 
 			self.resume();
 		},
@@ -548,7 +639,7 @@ if ( typeof Object.create !== 'function' ) {
 
 
 			//set our scrolling rate
-			self.options.refresh = 6000;
+			self.options.refresh = 1500;
 
 			//set the game to a running state
 			self.resume();
@@ -632,7 +723,7 @@ if ( typeof Object.create !== 'function' ) {
 
 	$.fn.tetris.options = {
 		level: 0,
-		refresh: 6000, 
+		refresh: 1500, 
 		rows: 22,
 		columns: 10,
 		tileSize: 16,
